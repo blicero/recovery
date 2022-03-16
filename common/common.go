@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 16. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-03-16 15:51:08 krylon>
+// Time-stamp: <2022-03-16 15:57:27 krylon>
 
 // Package common contains definitions used throughout the application
 package common
@@ -119,30 +119,13 @@ var LogPath = filepath.Join(BaseDir, fmt.Sprintf("%s.log", strings.ToLower(AppNa
 // DbPath is the filename of the database.
 var DbPath = filepath.Join(BaseDir, fmt.Sprintf("%s.db", strings.ToLower(AppName)))
 
-// CacheDir is the folder where prefetched images are stored.
-var CacheDir = filepath.Join(BaseDir, "cache")
-
-// ArchiveDir is the folder where downloaded/archived pages are stored.
-var ArchiveDir = filepath.Join("BaseDir", "archive")
-
 // InitApp performs some basic preparations for the application to run.
 // Currently, this means creating the BaseDir folder.
 func InitApp() error {
 	var err error
 
-	CacheDir = filepath.Join(BaseDir, "cache")
-	ArchiveDir = filepath.Join(BaseDir, "archive")
-
 	if err = os.Mkdir(BaseDir, 0700); err != nil && !os.IsExist(err) {
 		return fmt.Errorf("Error creating BaseDir %s: %s", BaseDir, err.Error())
-	} else if err = os.Mkdir(CacheDir, 0700); err != nil && !os.IsExist(err) {
-		return fmt.Errorf("Error creating CacheDir %s: %s",
-			CacheDir,
-			err.Error())
-	} else if err = os.Mkdir(ArchiveDir, 0700); err != nil && !os.IsExist(err) {
-		return fmt.Errorf("Error creating ArchiveDir %s: %s",
-			ArchiveDir,
-			err.Error())
 	}
 
 	LogPath = filepath.Join(BaseDir, fmt.Sprintf("%s.log", strings.ToLower(AppName)))
@@ -166,7 +149,6 @@ func SetBaseDir(path string) error {
 	BaseDir = path
 	LogPath = filepath.Join(BaseDir, fmt.Sprintf("%s.log", strings.ToLower(AppName)))
 	DbPath = filepath.Join(BaseDir, fmt.Sprintf("%s.db", strings.ToLower(AppName)))
-	CacheDir = filepath.Join(BaseDir, "cache")
 
 	var (
 		err error
