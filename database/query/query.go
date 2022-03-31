@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 22. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-03-22 15:08:16 krylon>
+// Time-stamp: <2022-03-31 19:55:19 krylon>
 
 //go:generate stringer -type=ID
 
@@ -15,6 +15,8 @@ type ID int8
 const (
 	MoodAdd ID = iota
 	MoodGetByTime
+	MoodGetMostRecent
 	CravingAdd
 	CravingGetByTime
+	CravingGetMostRecent
 )
