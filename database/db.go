@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 22. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-03-22 15:37:28 krylon>
+// Time-stamp: <2022-03-24 10:22:43 krylon>
 
 // Package database provides a wrapper around the database connection
 // that provides the database operations used by the application.
@@ -23,6 +23,8 @@ import (
 	"github.com/blicero/recovery/data"
 	"github.com/blicero/recovery/database/query"
 	"github.com/blicero/recovery/logdomain"
+
+	_ "github.com/mattn/go-sqlite3" // Import the database driver
 )
 
 var (
@@ -632,3 +634,65 @@ EXEC_QUERY:
 		return nil
 	}
 } // func (db *Database) MoodAdd(m *mood.Mood) error
+
+// MoodGetByTime returns all mood records for the given timespan.
+func (db *Database) MoodGetByTime(begin, end time.Time) ([]data.Mood, error) {
+	const qid query.ID = query.MoodGetByTime
+	var (
+		err  error
+		stmt *sql.Stmt
+	)
+
+	if begin.After(end) {
+		begin, end = end, begin
+	}
+
+	if stmt, err = db.getQuery(qid); err != nil {
+		db.log.Printf("[ERROR] Cannot prepare query %s: %s\n",
+			qid,
+			err.Error())
+		return nil, err
+	} else if db.tx != nil {
+		stmt = db.tx.Stmt(stmt)
+	}
+
+	var rows *sql.Rows
+
+EXEC_QUERY:
+	if rows, err = stmt.Query(begin.Unix(), end.Unix()); err != nil {
+		if worthARetry(err) {
+			waitForRetry()
+			goto EXEC_QUERY
+		}
+
+		return nil, err
+	}
+
+	defer rows.Close() // nolint: errcheck,gosec
+
+	var moods = make([]data.Mood, 0, 32)
+
+	for rows.Next() {
+		var (
+			m         data.Mood
+			note      *string
+			timestamp int64
+		)
+
+		if err = rows.Scan(&m.ID, &timestamp, &m.Score, &note); err != nil {
+			db.log.Printf("[ERROR] Cannot scan row: %s\n",
+				err.Error())
+			return nil, err
+		}
+
+		m.Timestamp = time.Unix(timestamp, 0)
+
+		if note != nil {
+			m.Note = *note
+		}
+
+		moods = append(moods, m)
+	}
+
+	return moods, nil
+} // func (db *Database) MoodGetByTime(begin, end time.Time) ([]data.Mood, error)
