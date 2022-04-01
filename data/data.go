@@ -2,7 +2,9 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 16. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-03-22 13:57:35 krylon>
+// Time-stamp: <2022-04-01 08:32:11 krylon>
+
+//go:generate ffjson data.go
 
 // Package data contains definitions for data types.
 package data

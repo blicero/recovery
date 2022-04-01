@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 01. 02. 2021 by Benjamin Walkenhorst
 // (c) 2021 Benjamin Walkenhorst
-// Time-stamp: <2022-03-31 19:56:08 krylon>
+// Time-stamp: <2022-04-01 08:32:24 krylon>
 
 // +build ignore
 
@@ -58,6 +58,7 @@ var candidates = map[string][]string{
 	"generate": []string{
 		"common",
 		"logdomain",
+		"data",
 		"database/query",
 	},
 	"test": []string{
