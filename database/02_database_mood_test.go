@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 29. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-03-31 15:51:55 krylon>
+// Time-stamp: <2022-04-01 08:56:27 krylon>
 
 package database
 
@@ -68,3 +68,24 @@ func TestMoodGetByTime(t *testing.T) {
 			moodCnt)
 	}
 } // func TestMoodGetByTime(t *testing.T)
+
+func TestMoodGetMostRecent(t *testing.T) {
+	if db == nil {
+		t.SkipNow()
+	}
+
+	var (
+		err     error
+		results []data.Mood
+	)
+
+	if results, err = db.MoodGetMostRecent(moodCnt); err != nil {
+		t.Fatalf("Error getting %d most recent mood entries: %s",
+			moodCnt,
+			err.Error())
+	} else if len(results) != moodCnt {
+		t.Fatalf("Unexpected number of results: %d (expected %d)",
+			len(results),
+			moodCnt)
+	}
+} // func TestMoodGetMostRecent(t *testing.T)
