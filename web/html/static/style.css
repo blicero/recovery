@@ -1,4 +1,4 @@
-/* Time-stamp: <2021-03-11 19:11:38 krylon> */
+/* Time-stamp: <2022-04-01 15:50:08 krylon> */
 
 body { 
     font-family: Arial,Helvetica,sans-serif;
@@ -157,6 +157,11 @@ div.body {
 *.placeholder {
     font-family: monospace;
     font-weight: bold;
+}
+
+fieldset {
+  border: 2px #6f6f6f solid;
+  border-radius: 10px;
 }
 
 /* #note_preview { */

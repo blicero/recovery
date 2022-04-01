@@ -1,6 +1,6 @@
 {{ define "mood_view" }}
 {{/* Created on 26. 03. 2021 */}}
-{{/* Time-stamp: <2021-03-26 23:04:23 krylon> */}}
+{{/* Time-stamp: <2022-04-01 18:19:29 krylon> */}}
 <table class="table">
   <thead>
     <tr>
@@ -11,10 +11,10 @@
   </thead>
 
   <tbody>
-    {{ range .Data }}
+    {{ range .Mood }}
     <tr>
-      <td>{{ fmt_time .Time }}</td>
-      <td>{{ .Level }}</td>
+      <td>{{ fmt_time .Timestamp }}</td>
+      <td>{{ .Score }}</td>
       <td>{{ .Note }}</td>
     </tr>
     {{ end }}

@@ -1,5 +1,5 @@
 {{ define "head" }}
-{{/* Time-stamp: <2021-04-08 22:31:55 krylon> */}}
+{{/* Time-stamp: <2022-04-01 18:18:11 krylon> */}}
 <head>
   <title>{{ app_string }}@{{ hostname  }} - {{ .Title }}</title>
   
@@ -12,7 +12,13 @@
   <script src="/static/settings.js"></script>
   <script src="/static/interact.js"></script>
   {{/* <script src="/static/d3.min.js"></script> */}}
-  <script src="/static/Chart.bundle.min.js"></script>
+  {{/*<script src="/static/Chart.bundle.min.js"></script>*/}}
+  <script src="/static/chart.js"></script>
+  <script src="/static/chartjs-adapter-date-fns.bundle.min.js"></script>
+  {{/*
+  <script src="/static/chart.esm.min.js"></script>
+  <script src="/static/helpers.esm.min.js"></script>
+  */}}
 
   <script>
    $(document).ready(function() {
@@ -49,6 +55,6 @@
   <link rel="stylesheet" type="text/css" href="/static/bootstrap.min.css" />
   <link rel="stylesheet" href="/static/bootstrap-reboot.min.css" />
   <link rel="stylesheet" href="/static/bootstrap-utilities.min.css" />
-  <link rel="stylesheet" href="/static/Chart.min.css" />
+  {{/*<link rel="stylesheet" href="/static/Chart.min.css" />*/}}
 </head>
 {{ end }}

@@ -1,111 +1,117 @@
 {{ define "mood_form" }}
 {{/* Created on 25. 03. 2021 */}}
-{{/* Time-stamp: <2021-04-08 22:03:39 krylon> */}}
-<div class="container">
-  <script>
-   function update_timestamp() {
-     const now = new Date();
-     const year = now.getYear() + 1900;
-     const month = now.getMonth() + 1;
-     const day = now.getDate();
-     const hour = now.getHours();
-     const minute = now.getMinutes();
+{{/* Time-stamp: <2022-04-01 15:58:33 krylon> */}}
+<form action="/mood_submit"
+      method="post">
+  <div class="container">
+    <script>
+     function update_timestamp() {
+       const now = new Date();
+       const year = now.getYear() + 1900;
+       const month = now.getMonth() + 1;
+       const day = now.getDate();
+       const hour = now.getHours();
+       const minute = now.getMinutes();
 
-     const date = "" + year + "-" +
-                  (month < 10 ? "0" : "") + month + "-" +
-                   (day < 10 ? "0" : "") + day;
-     const time = "" + (hour < 10 ? "0" : "") + hour + ":" +
-                        (minute < 10 ? "0" : "") + minute;
+       const date = "" + year + "-" +
+                    (month < 10 ? "0" : "") + month + "-" +
+                     (day < 10 ? "0" : "") + day;
+       const time = "" + (hour < 10 ? "0" : "") + hour + ":" +
+                          (minute < 10 ? "0" : "") + minute;
 
-     $("#mood_date")[0].value = date;
-     $("#mood_time")[0].value = time;
-     return false;
-   } // function update_timestamp()
+       $("#mood_date")[0].value = date;
+       $("#mood_time")[0].value = time;
+       return false;
+     } // function update_timestamp()
 
-   function check_update_timestamp() {
-     try {
-       const cb = $("#check_update_ts")[0].checked;
+     function check_update_timestamp() {
+       try {
+         const cb = $("#check_update_ts")[0].checked;
 
-       // saveSetting("mood", "syncTimeField", cb);
+         // saveSetting("mood", "syncTimeField", cb);
 
-       if (cb) {
-         update_timestamp();
+         if (cb) {
+           update_timestamp();
+         }
+       } finally {
+         window.setTimeout(check_update_timestamp, 1000);
        }
-     } finally {
-       window.setTimeout(check_update_timestamp, 1000);
+     } // function check_update_timestamp()
+
+     function save_sync_flag() {
+       const cb = $("#check_update_ts")[0].checked;
+       saveSetting("mood", "syncTimeField", cb);
      }
-   } // function check_update_timestamp()
 
-   function save_sync_flag() {
-     const cb = $("#check_update_ts")[0].checked;
-     saveSetting("mood", "syncTimeField", cb);
-   }
-
-   $(document).ready(function() {
-     $("#check_update_ts")[0].checked = settings.mood.syncTimeField;
-     check_update_timestamp();
-   });
-  </script>
-  <div class="row">
-    <div class="col">
-      <label for="mood_date">Datum</label>
-      <input type="date"
-             name="mood_date"
-             id="mood_date"
-             value="{{ current_date }}"
-             />
+     $(document).ready(function() {
+       $("#check_update_ts")[0].checked = settings.mood.syncTimeField;
+       check_update_timestamp();
+     });
+    </script>
+    <div class="row">
+      <h3>Mood</h3>
     </div>
-    <div class="col">
-      <label for="mood_time">Time</label>
-      <input type="time"
-             name="mood_time"
-             id="mood_time"
-             value="{{ current_time }}"
-             />
-      &nbsp;
-      <label for="check_update_ts">Sync time?</label>
-      <input type="checkbox"
-             name="check_update_ts"
-             id="check_update_ts"
-             onchange="save_sync_flag();"
-             />
+    <div class="row">
+      <div class="col">
+        <label for="mood_date">Datum</label>
+        <input type="date"
+               name="mood_date"
+               id="mood_date"
+               value="{{ current_date }}"
+               />
+      </div>
+      <div class="col">
+        <label for="mood_time">Time</label>
+        <input type="time"
+               name="mood_time"
+               id="mood_time"
+               value="{{ current_time }}"
+               />
+        &nbsp;
+        <label for="check_update_ts">Sync time?</label>
+        <input type="checkbox"
+               name="check_update_ts"
+               id="check_update_ts"
+               onchange="save_sync_flag();"
+               />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label for="mood_score">Score</label>
+        <input type="range"
+               min="1"
+               max="255"
+               value="127"
+               name="mood_score"
+               id="mood_score"
+               oninput="update_score_display();"
+               />
+      </div>
+      <div class="col" id="score_display">
+        127
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label for="mood_note">Note</label>
+        <input type="text"
+               name="mood_note"
+               id="mood_note"
+               placeholder="Note"
+               />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <input type="reset"
+               value="Reset" />
+      </div>
+      <div class="col">
+        <input type="submit"
+               value="Save" />
+      </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col">
-      <label for="mood_score">Score</label>
-      <input type="range"
-             min="1"
-             max="255"
-             value="127"
-             name="mood_score"
-             id="mood_score"
-             oninput="update_score_display();"
-             />
-    </div>
-    <div class="col" id="score_display">
-      127
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <label for="mood_note">Note</label>
-      <input type="text"
-             name="mood_note"
-             id="mood_note"
-             placeholder="Note"
-             />
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <input type="reset"
-             value="Reset" />
-    </div>
-    <div class="col">
-      <input type="submit"
-             value="Save" />
-    </div>
-  </div>
-</div>
+</form>
 {{ end }}

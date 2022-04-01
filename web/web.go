@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 01. 04. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-01 09:14:38 krylon>
+// Time-stamp: <2022-04-01 10:42:45 krylon>
 
 // Package web provides the web interface to the application.
 package web
@@ -12,13 +12,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"io/fs"
 	"log"
 	"net/http"
 	"path/filepath"
 	"regexp"
+	"text/template"
 	"time"
 
 	"github.com/blicero/krylib"
@@ -118,7 +118,7 @@ func Create(addr string, keepAlive bool) (*Server, error) {
 	srv.router.HandleFunc("/favicon.ico", srv.handleFavIco)
 	srv.router.HandleFunc("/static/{file}", srv.handleStaticFile)
 	srv.router.HandleFunc("/{page:(?i)(?:index|main)?$}", srv.handleIndex)
-	srv.router.HandleFunc("/mood_submit", srv.handleMoodSubmit)
+	// srv.router.HandleFunc("/mood_submit", srv.handleMoodSubmit)
 
 	srv.router.HandleFunc("/ajax/beacon", srv.handleBeacon)
 	srv.router.HandleFunc("/ajax/get_messages", srv.handleGetNewMessages)
@@ -201,6 +201,71 @@ func (srv *Server) getMessages() []message {
 /////////////////////////////////////////
 ////////////// Web UI ///////////////////
 /////////////////////////////////////////
+
+func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+	srv.log.Printf("[TRACE] Handle request for %s\n",
+		r.URL.EscapedPath())
+
+	const (
+		tmplName = "index"
+		timespan = 86400 * 14
+	)
+
+	var (
+		err        error
+		msg        string
+		begin, end time.Time
+		db         *database.Database
+		tmpl       *template.Template
+		data       = tmplDataIndex{
+			tmplDataBase: tmplDataBase{
+				Title: "Main",
+				Debug: common.Debug,
+				URL:   r.URL.String(),
+			},
+		}
+	)
+
+	end = time.Now()
+	begin = end.Add(-(time.Second * timespan))
+
+	if tmpl = srv.tmpl.Lookup(tmplName); tmpl == nil {
+		msg = fmt.Sprintf("Could not find template %q", tmplName)
+		srv.log.Println("[CRITICAL] " + msg)
+		srv.sendErrorMessage(w, msg)
+		return
+	}
+
+	db = srv.pool.Get()
+	defer srv.pool.Put(db)
+
+	if data.Mood, err = db.MoodGetByTime(begin, end); err != nil {
+		msg = fmt.Sprintf("Cannot load mood data: %s",
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		srv.sendErrorMessage(w, msg)
+		return
+	} else if data.Craving, err = db.CravingGetByTime(begin, end); err != nil {
+		msg = fmt.Sprintf("Cannot load craving data: %s",
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		srv.sendErrorMessage(w, msg)
+		return
+	}
+
+	data.Messages = srv.getMessages()
+
+	w.Header().Set("Cache-Control", "no-store, max-age=0")
+	if err = tmpl.Execute(w, &data); err != nil {
+		msg = fmt.Sprintf("Error rendering template %q: %s",
+			tmplName,
+			err.Error())
+		srv.SendMessage(msg)
+		srv.sendErrorMessage(w, msg)
+	}
+} // func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request)
 
 /////////////////////////////////////////
 ////////////// Other ////////////////////
