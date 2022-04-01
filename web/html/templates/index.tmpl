@@ -1,0 +1,22 @@
+{{ define "index" }}
+{{/* Time-stamp: <2021-03-29 21:04:36 krylon> */}}
+<!DOCTYPE html>
+<html>
+  {{ template "head" . }}
+
+  <body>
+    {{ template "intro" . }}
+
+    <form action="/mood_submit"
+          method="post">
+      {{ template "mood_form" . }}
+    </form>
+
+    {{ template "mood_graph" . }}
+
+    {{ template "mood_view" . }}
+
+    {{ template "footer" }}
+  </body>
+</html>
+{{ end }}
