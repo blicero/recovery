@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 22. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-03-24 10:22:43 krylon>
+// Time-stamp: <2022-04-01 08:57:09 krylon>
 
 // Package database provides a wrapper around the database connection
 // that provides the database operations used by the application.
@@ -696,3 +696,280 @@ EXEC_QUERY:
 
 	return moods, nil
 } // func (db *Database) MoodGetByTime(begin, end time.Time) ([]data.Mood, error)
+
+// MoodGetMostRecent returns the <cnt> most recent mood records.
+func (db *Database) MoodGetMostRecent(cnt int) ([]data.Mood, error) {
+	const qid query.ID = query.MoodGetMostRecent
+	var (
+		err  error
+		stmt *sql.Stmt
+	)
+
+	if stmt, err = db.getQuery(qid); err != nil {
+		db.log.Printf("[ERROR] Cannot prepare query %s: %s\n",
+			qid,
+			err.Error())
+		return nil, err
+	} else if db.tx != nil {
+		stmt = db.tx.Stmt(stmt)
+	}
+
+	var rows *sql.Rows
+
+EXEC_QUERY:
+	if rows, err = stmt.Query(cnt); err != nil {
+		if worthARetry(err) {
+			waitForRetry()
+			goto EXEC_QUERY
+		}
+
+		return nil, err
+	}
+
+	defer rows.Close() // nolint: errcheck,gosec
+
+	var moods = make([]data.Mood, 0, 32)
+
+	for rows.Next() {
+		var (
+			m         data.Mood
+			note      *string
+			timestamp int64
+		)
+
+		if err = rows.Scan(&m.ID, &timestamp, &m.Score, &note); err != nil {
+			db.log.Printf("[ERROR] Cannot scan row: %s\n",
+				err.Error())
+			return nil, err
+		}
+
+		m.Timestamp = time.Unix(timestamp, 0)
+
+		if note != nil {
+			m.Note = *note
+		}
+
+		moods = append(moods, m)
+	}
+
+	var (
+		l   = len(moods)
+		rev = make([]data.Mood, l)
+	)
+
+	for i, v := range moods {
+		rev[l-(i+1)] = v
+	}
+
+	return rev, nil
+} // func (db *Database) MoodGetMostRecent(cnt int) ([]data.Mood, error)
+
+// CravingAdd adds a new data point to the database.
+func (db *Database) CravingAdd(c *data.Craving) error {
+	const qid query.ID = query.CravingAdd
+	var (
+		err    error
+		msg    string
+		stmt   *sql.Stmt
+		tx     *sql.Tx
+		status bool
+	)
+
+	if stmt, err = db.getQuery(qid); err != nil {
+		db.log.Printf("[ERROR] Cannot prepare query %s: %s\n",
+			qid.String(),
+			err.Error())
+		return err
+	} else if db.tx != nil {
+		tx = db.tx
+	} else {
+	BEGIN_AD_HOC:
+		if tx, err = db.db.Begin(); err != nil {
+			if worthARetry(err) {
+				waitForRetry()
+				goto BEGIN_AD_HOC
+			} else {
+				msg = fmt.Sprintf("Error starting transaction: %s\n",
+					err.Error())
+				db.log.Printf("[ERROR] %s\n", msg)
+				return errors.New(msg)
+			}
+
+		} else {
+			defer func() {
+				var err2 error
+				if status {
+					if err2 = tx.Commit(); err2 != nil {
+						db.log.Printf("[ERROR] Failed to commit ad-hoc transaction: %s\n",
+							err2.Error())
+					}
+				} else if err2 = tx.Rollback(); err2 != nil {
+					db.log.Printf("[ERROR] Rollback of ad-hoc transaction failed: %s\n",
+						err2.Error())
+				}
+			}()
+		}
+	}
+
+	stmt = tx.Stmt(stmt)
+	var res sql.Result
+	var note *string
+
+	if c.Note != "" {
+		note = &c.Note
+	}
+
+EXEC_QUERY:
+	if res, err = stmt.Exec(c.Timestamp.Unix(), c.Score, note); err != nil {
+		if worthARetry(err) {
+			waitForRetry()
+			goto EXEC_QUERY
+		} else {
+			err = fmt.Errorf("Cannot add craving to database: %s",
+				err.Error())
+			db.log.Printf("[ERROR] %s\n", err.Error())
+			return err
+		}
+	} else {
+		var cravingID int64
+
+		if cravingID, err = res.LastInsertId(); err != nil {
+			db.log.Printf("[ERROR] Cannot get ID of Craving: %s\n",
+				err.Error())
+			return err
+		}
+
+		status = true
+		c.ID = cravingID
+		return nil
+	}
+} // func (db *Database) CravingAdd(c *data.Craving) error
+
+// CravingGetByTime returns all craving records for the given timespan.
+func (db *Database) CravingGetByTime(begin, end time.Time) ([]data.Craving, error) {
+	const qid query.ID = query.CravingGetByTime
+	var (
+		err  error
+		stmt *sql.Stmt
+	)
+
+	if begin.After(end) {
+		begin, end = end, begin
+	}
+
+	if stmt, err = db.getQuery(qid); err != nil {
+		db.log.Printf("[ERROR] Cannot prepare query %s: %s\n",
+			qid,
+			err.Error())
+		return nil, err
+	} else if db.tx != nil {
+		stmt = db.tx.Stmt(stmt)
+	}
+
+	var rows *sql.Rows
+
+EXEC_QUERY:
+	if rows, err = stmt.Query(begin.Unix(), end.Unix()); err != nil {
+		if worthARetry(err) {
+			waitForRetry()
+			goto EXEC_QUERY
+		}
+
+		return nil, err
+	}
+
+	defer rows.Close() // nolint: errcheck,gosec
+
+	var cravings = make([]data.Craving, 0, 32)
+
+	for rows.Next() {
+		var (
+			m         data.Craving
+			note      *string
+			timestamp int64
+		)
+
+		if err = rows.Scan(&m.ID, &timestamp, &m.Score, &note); err != nil {
+			db.log.Printf("[ERROR] Cannot scan row: %s\n",
+				err.Error())
+			return nil, err
+		}
+
+		m.Timestamp = time.Unix(timestamp, 0)
+
+		if note != nil {
+			m.Note = *note
+		}
+
+		cravings = append(cravings, m)
+	}
+
+	return cravings, nil
+} // func (db *Database) CravingGetByTime(begin, end time.Time) ([]data.Craving, error)
+
+// CravingGetMostRecent returns the <cnt> most recent craving records.
+func (db *Database) CravingGetMostRecent(cnt int) ([]data.Craving, error) {
+	const qid query.ID = query.CravingGetMostRecent
+	var (
+		err  error
+		stmt *sql.Stmt
+	)
+
+	if stmt, err = db.getQuery(qid); err != nil {
+		db.log.Printf("[ERROR] Cannot prepare query %s: %s\n",
+			qid,
+			err.Error())
+		return nil, err
+	} else if db.tx != nil {
+		stmt = db.tx.Stmt(stmt)
+	}
+
+	var rows *sql.Rows
+
+EXEC_QUERY:
+	if rows, err = stmt.Query(cnt); err != nil {
+		if worthARetry(err) {
+			waitForRetry()
+			goto EXEC_QUERY
+		}
+
+		return nil, err
+	}
+
+	defer rows.Close() // nolint: errcheck,gosec
+
+	var cravings = make([]data.Craving, 0, 32)
+
+	for rows.Next() {
+		var (
+			m         data.Craving
+			note      *string
+			timestamp int64
+		)
+
+		if err = rows.Scan(&m.ID, &timestamp, &m.Score, &note); err != nil {
+			db.log.Printf("[ERROR] Cannot scan row: %s\n",
+				err.Error())
+			return nil, err
+		}
+
+		m.Timestamp = time.Unix(timestamp, 0)
+
+		if note != nil {
+			m.Note = *note
+		}
+
+		cravings = append(cravings, m)
+	}
+
+	var (
+		l   = len(cravings)
+		rev = make([]data.Craving, l)
+	)
+
+	for i, v := range cravings {
+		rev[l-(i+1)] = v
+	}
+
+	return rev, nil
+} // func (db *Database) CravingGetMostRecent(cnt int) ([]data.Craving, error)

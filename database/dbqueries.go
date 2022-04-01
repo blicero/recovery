@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 22. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-03-22 15:30:58 krylon>
+// Time-stamp: <2022-04-01 08:40:45 krylon>
 
 package database
 
@@ -20,6 +20,16 @@ FROM mood
 WHERE timestamp BETWEEN ? AND ?
 ORDER BY timestamp
 `,
+	query.MoodGetMostRecent: `
+SELECT
+    id,
+    timestamp,
+    score,
+    note
+FROM mood
+ORDER BY timestamp DESC
+LIMIT ?
+`,
 	query.CravingAdd: "INSERT INTO craving (timestamp, score, note) VALUES (?, ?, ?)",
 	query.CravingGetByTime: `
 SELECT
@@ -30,5 +40,15 @@ SELECT
 FROM craving
 WHERE timestamp BETWEEN ? AND ?
 ORDER BY timestamp
+`,
+	query.CravingGetMostRecent: `
+SELECT
+    id,
+    timestamp,
+    score,
+    note
+FROM craving
+ORDER BY timestamp DESC
+LIMIT ?
 `,
 }
