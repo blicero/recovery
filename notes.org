@@ -1,0 +1,23 @@
+# -*- mode: org; fill-column: 78; -*-
+# Time-stamp: <2022-04-02 21:10:53 krylon>
+#
+#+TAGS: optimize(o) refactor(r) bug(b) feature(f) architecture(a)
+#+TAGS: web(w) database(d) javascript(j)
+#+TODO: TODO(t) IMPLEMENT(i) TEST(e) RESEARCH(r) | DONE(d)
+#+TODO: MEDITATE(m) PLANNING(p) REFINE(n) | FAILED(f) CANCELLED(c) SUSPENDED(s)
+#+PRIORITIES: A G D
+
+* Recovery
+
+** Clocktable
+   #+BEGIN: clocktable :scope file :maxlevel 20
+   #+CAPTION: Clock summary at [2022-04-02 Sa 21:10]
+   | Headline     | Time   |
+   |--------------+--------|
+   | *Total time* | *0:00* |
+   #+END:
+** Questions
+** Database [0/0]                                                    :database:
+** Web [0/1]                                                            :web:
+*** TODO DB Maintenance                                            :database:
+*** Graph                                                        :javascript:
