@@ -1,5 +1,5 @@
 {{ define "index" }}
-{{/* Time-stamp: <2022-04-01 15:58:40 krylon> */}}
+{{/* Time-stamp: <2022-04-02 15:16:57 krylon> */}}
 <!DOCTYPE html>
 <html>
   {{ template "head" . }}
@@ -7,11 +7,21 @@
   <body>
     {{ template "intro" . }}
 
-    {{ template "mood_form" . }}
+    <p>
+      {{ template "mood_form" . }}
+    </p>
 
-    {{ template "mood_graph" . }}
+    <p>
+      <hr />
+    </p>
 
-    {{ template "mood_view" . }}
+    <p>
+      {{ template "mood_graph" . }}
+    </p>
+
+    <p>
+      {{ template "mood_view" . }}
+    </p>
 
     {{ template "footer" }}
   </body>

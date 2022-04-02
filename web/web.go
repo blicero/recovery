@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 01. 04. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-01 10:42:45 krylon>
+// Time-stamp: <2022-04-02 17:51:30 krylon>
 
 // Package web provides the web interface to the application.
 package web
@@ -18,11 +18,13 @@ import (
 	"net/http"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"text/template"
 	"time"
 
 	"github.com/blicero/krylib"
 	"github.com/blicero/recovery/common"
+	"github.com/blicero/recovery/data"
 	"github.com/blicero/recovery/database"
 	"github.com/blicero/recovery/logdomain"
 	"github.com/gorilla/mux"
@@ -118,7 +120,7 @@ func Create(addr string, keepAlive bool) (*Server, error) {
 	srv.router.HandleFunc("/favicon.ico", srv.handleFavIco)
 	srv.router.HandleFunc("/static/{file}", srv.handleStaticFile)
 	srv.router.HandleFunc("/{page:(?i)(?:index|main)?$}", srv.handleIndex)
-	// srv.router.HandleFunc("/mood_submit", srv.handleMoodSubmit)
+	srv.router.HandleFunc("/mood_submit", srv.handleSubmit)
 
 	srv.router.HandleFunc("/ajax/beacon", srv.handleBeacon)
 	srv.router.HandleFunc("/ajax/get_messages", srv.handleGetNewMessages)
@@ -266,6 +268,137 @@ func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		srv.sendErrorMessage(w, msg)
 	}
 } // func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request)
+
+func (srv *Server) handleSubmit(w http.ResponseWriter, r *http.Request) {
+	srv.log.Printf("[TRACE] Handle request for %s\n",
+		r.URL.EscapedPath())
+
+	var (
+		err              error
+		msg              string
+		dStr, tStr, lStr string
+		score            uint64
+		moodData         data.Mood
+		cravingData      data.Craving
+		db               *database.Database
+	)
+
+	if err = r.ParseForm(); err != nil {
+		msg = fmt.Sprintf("Cannot parse form data: %s",
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	}
+
+	dStr = r.FormValue("mood_date")
+	tStr = r.FormValue("mood_time")
+	lStr = r.FormValue("mood_score")
+	moodData.Note = r.FormValue("mood_note")
+
+	srv.log.Printf("[DEBUG] dStr = %q, tStr = %q, lStr = %q\n",
+		dStr,
+		tStr,
+		lStr)
+
+	var stampStr = dStr + " " + tStr
+
+	if moodData.Timestamp, err = time.ParseInLocation(common.TimestampFormatMinute, stampStr, time.Local); err != nil {
+		msg = fmt.Sprintf("Cannot parse timestamp %q: %s",
+			stampStr,
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	} else if score, err = strconv.ParseUint(lStr, 10, 8); err != nil {
+		msg = fmt.Sprintf("Cannot parse score %q: %s",
+			lStr,
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	} else if moodData.Timestamp.After(time.Now()) {
+		msg = fmt.Sprintf("Timestamp is from the future: %s",
+			moodData.Timestamp.Format(common.TimestampFormat))
+		srv.log.Printf("[WARN] %s\n", msg)
+		srv.SendMessage(msg)
+	}
+
+	moodData.Score = uint8(score)
+
+	// dStr = r.FormValue("craving_date")
+	// tStr = r.FormValue("craving_time")
+	lStr = r.FormValue("craving_score")
+	cravingData.Note = r.FormValue("craving_note")
+	// stampStr = dStr + " " + tStr
+
+	/* if cravingData.Timestamp, err = time.ParseInLocation(common.TimestampFormatMinute, stampStr, time.Local); err != nil {
+		msg = fmt.Sprintf("Cannot parse timestamp %q: %s",
+			stampStr,
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	} else */
+	if score, err = strconv.ParseUint(lStr, 10, 8); err != nil {
+		msg = fmt.Sprintf("Cannot parse score %q: %s",
+			lStr,
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	} /* else if cravingData.Timestamp.After(time.Now()) {
+		msg = fmt.Sprintf("Timestamp is from the future: %s",
+			cravingData.Timestamp.Format(common.TimestampFormat))
+		srv.log.Printf("[WARN] %s\n", msg)
+		srv.SendMessage(msg)
+	} */
+
+	cravingData.Score = uint8(score)
+
+	db = srv.pool.Get()
+	defer srv.pool.Put(db)
+
+	if err = db.Begin(); err != nil {
+		msg = fmt.Sprintf("Cannot initiate transaction: %s",
+			err.Error())
+		srv.sendErrorMessage(w, msg)
+		return
+	} else if err = db.MoodAdd(&moodData); err != nil {
+		msg = fmt.Sprintf("Cannot add mood %q to database: %s",
+			moodData,
+			err.Error())
+		db.Rollback() // nolint: errcheck
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	} else if err = db.CravingAdd(&cravingData); err != nil {
+		msg = fmt.Sprintf("Cannot add craving %q to database: %s",
+			moodData,
+			err.Error())
+		db.Rollback() // nolint: errcheck
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	} else if err = db.Commit(); err != nil {
+		msg = fmt.Sprintf("Cannot commit database transaction: %s",
+			err.Error())
+		db.Rollback() // nolint: errcheck
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		return
+	}
+
+	http.Redirect(w, r, r.Referer(), http.StatusFound)
+} // func (srv *Server) handleSubmit(w http.ResponseWriter, r *http.Request)
 
 /////////////////////////////////////////
 ////////////// Other ////////////////////

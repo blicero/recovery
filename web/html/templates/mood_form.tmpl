@@ -1,6 +1,6 @@
 {{ define "mood_form" }}
 {{/* Created on 25. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-01 15:58:33 krylon> */}}
+{{/* Time-stamp: <2022-04-02 15:18:23 krylon> */}}
 <form action="/mood_submit"
       method="post">
   <div class="container">
@@ -85,10 +85,10 @@
                value="127"
                name="mood_score"
                id="mood_score"
-               oninput="update_score_display();"
+               oninput="update_score_display('mood');"
                />
       </div>
-      <div class="col" id="score_display">
+      <div class="col" id="mood_score_display">
         127
       </div>
     </div>
@@ -101,6 +101,41 @@
                placeholder="Note"
                />
       </div>
+    </div>
+    <div class="row">
+      &nbsp;
+    </div>
+    <div class="row">
+      <h3>Craving</h3>
+    </div>
+    <div class="row">
+      <div class="col">
+                <label for="craving_score">Score</label>
+        <input type="range"
+               min="1"
+               max="255"
+               value="127"
+               name="craving_score"
+               id="craving_score"
+               oninput="update_score_display('craving');"
+               />
+      </div>
+      <div class="col" id="craving_score_display">
+        127
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label for="craving_note">Note</label>
+        <input type="text"
+               name="craving_note"
+               id="craving_note"
+               placeholder="Note"
+               />
+      </div>
+    </div>
+    <div class="row">
+      &nbsp;
     </div>
     <div class="row">
       <div class="col">

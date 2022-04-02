@@ -1,4 +1,4 @@
-// Time-stamp: <2021-03-27 01:03:24 krylon>
+// Time-stamp: <2022-04-02 15:19:43 krylon>
 // -*- mode: javascript; coding: utf-8; -*-
 // Copyright 2015-2020 Benjamin Walkenhorst <krylon@gmx.net>
 //
@@ -373,9 +373,9 @@ function toggleMsgDisplayVisible() {
     display.hidden = !display.hidden;
 } // function toggleMsgDisplayVisible()
 
-function update_score_display() {
-    const input_id = "#mood_score";
-    const display_id = "#score_display";
+function update_score_display(name) {
+    const input_id = `#${name}_score`;
+    const display_id = `#${name}_score_display`;
 
     const val = $(input_id)[0].value;
 
