@@ -1,6 +1,6 @@
 {{ define "mood_graph" }}
 {{/* Created on 28. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-01 19:43:18 krylon> */}}
+{{/* Time-stamp: <2022-04-02 18:47:30 krylon> */}}
 <div class="container">
   <canvas id="mood_graph" width="400" height=200"></canvas>
   <script>
@@ -14,8 +14,9 @@
            data: [
              {{ range .Mood }}
              { 
-               x: new Date("{{ fmt_time .Timestamp }}"),
-               y: {{ .Score }},
+               timestamp:       new Date("{{ fmt_time .Timestamp }}"),
+               score:           {{ .Score }},
+               note:            "{{ js .Note }}",
              },
              {{ end }}
            ], // .reverse(),
@@ -43,8 +44,9 @@
            data: [
              {{ range .Craving }}
              { 
-               x: new Date("{{ fmt_time .Timestamp }}"),
-               y: {{ .Score }},
+               timestamp: new Date("{{ fmt_time .Timestamp }}"),
+               score: {{ .Score }},
+               note: "{{ js .Note }}",
              },
              {{ end }}
            ], // .reverse(),
@@ -70,6 +72,10 @@
        ],
      },
      options: {
+       parsing: {
+         xAxisKey: "timestamp",
+         yAxisKey: "score",
+       },
        scales: {
          x: {
            type: "time",
