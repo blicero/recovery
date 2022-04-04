@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 01. 04. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-02 20:58:22 krylon>
+// Time-stamp: <2022-04-04 08:26:52 krylon>
 
 // Package web provides the web interface to the application.
 package web
@@ -121,6 +121,7 @@ func Create(addr string, keepAlive bool) (*Server, error) {
 	srv.router.HandleFunc("/static/{file}", srv.handleStaticFile)
 	srv.router.HandleFunc("/{page:(?i)(?:index|main)?$}", srv.handleIndex)
 	srv.router.HandleFunc("/mood_submit", srv.handleSubmit)
+	srv.router.HandleFunc("/db_maintenance", srv.handleDBMaintenance)
 
 	srv.router.HandleFunc("/ajax/beacon", srv.handleBeacon)
 	srv.router.HandleFunc("/ajax/get_messages", srv.handleGetNewMessages)
@@ -360,8 +361,6 @@ func (srv *Server) handleSubmit(w http.ResponseWriter, r *http.Request) {
 		db.Rollback() // nolint: errcheck
 		srv.log.Println("[ERROR] " + msg)
 		srv.SendMessage(msg)
-		http.Redirect(w, r, r.Referer(), http.StatusFound)
-		return
 	} else if err = db.CravingAdd(&cravingData); err != nil {
 		msg = fmt.Sprintf("Cannot add craving %q to database: %s",
 			moodData,
@@ -369,20 +368,40 @@ func (srv *Server) handleSubmit(w http.ResponseWriter, r *http.Request) {
 		db.Rollback() // nolint: errcheck
 		srv.log.Println("[ERROR] " + msg)
 		srv.SendMessage(msg)
-		http.Redirect(w, r, r.Referer(), http.StatusFound)
-		return
 	} else if err = db.Commit(); err != nil {
 		msg = fmt.Sprintf("Cannot commit database transaction: %s",
 			err.Error())
 		db.Rollback() // nolint: errcheck
 		srv.log.Println("[ERROR] " + msg)
 		srv.SendMessage(msg)
-		http.Redirect(w, r, r.Referer(), http.StatusFound)
-		return
 	}
 
 	http.Redirect(w, r, r.Referer(), http.StatusFound)
 } // func (srv *Server) handleSubmit(w http.ResponseWriter, r *http.Request)
+
+func (srv *Server) handleDBMaintenance(w http.ResponseWriter, r *http.Request) {
+	srv.log.Printf("[TRACE] Handle request for %s\n",
+		r.URL.EscapedPath())
+
+	var (
+		err error
+		db  *database.Database
+	)
+
+	db = srv.pool.Get()
+	defer srv.pool.Put(db)
+
+	if err = db.PerformMaintenance(); err != nil {
+		var msg = fmt.Sprintf("Failed to run database maintenance: %s",
+			err.Error())
+		srv.log.Printf("[ERROR] %s\n", msg)
+		srv.SendMessage(msg)
+	} else {
+		srv.SendMessage("DB Maintenance finished successfully.")
+	}
+
+	http.Redirect(w, r, r.Referer(), http.StatusFound)
+} // func (srv *Server) handleDBMaintenance(w http.ResponseWriter, r *http.Request)
 
 /////////////////////////////////////////
 ////////////// Other ////////////////////
