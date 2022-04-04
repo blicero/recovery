@@ -1,6 +1,6 @@
 {{ define "mood_graph" }}
 {{/* Created on 28. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-03 14:19:06 krylon> */}}
+{{/* Time-stamp: <2022-04-04 09:01:25 krylon> */}}
 <div class="container">
   <canvas id="mood_graph" width="400" height=200"></canvas>
   <script>
@@ -103,17 +103,20 @@
        plugins: {
          tooltip: {
            callbacks: {
+             title: function(ctx) {
+               return ctx[0].dataset.data[ctx[0].dataIndex].timestamp.toLocaleString()
+             },
              label: function(context) {
-               let label = context.dataset.label || '';
+               let lbl = context.dataset.label || '';
                const note = context.dataset.data[context.dataIndex].note
                const score = context.dataset.data[context.dataIndex].score
 
-               label += `: ${score}`
+               lbl += `: ${score}`
 
-               if (label && note != '') {
-                 label += ` (${note})`;
+               if (lbl && note != '') {
+                 lbl += ` (${note})`;
                }
-               return label;
+               return lbl;
              },
            },
          },
