@@ -1,5 +1,5 @@
 # -*- mode: org; fill-column: 78; -*-
-# Time-stamp: <2022-04-04 08:28:18 krylon>
+# Time-stamp: <2022-04-04 09:01:04 krylon>
 #
 #+TAGS: optimize(o) refactor(r) bug(b) feature(f) architecture(a)
 #+TAGS: web(w) database(d) javascript(j)
@@ -11,16 +11,16 @@
 
 ** Clocktable
    #+BEGIN: clocktable :scope file :maxlevel 20
-   #+CAPTION: Clock summary at [2022-04-04 Mo 08:28]
+   #+CAPTION: Clock summary at [2022-04-04 Mo 09:01]
    | Headline             | Time   |      |      |      |
    |----------------------+--------+------+------+------|
-   | *Total time*         | *1:29* |      |      |      |
+   | *Total time*         | *1:35* |      |      |      |
    |----------------------+--------+------+------+------|
-   | Recovery             | 1:29   |      |      |      |
-   | \_  Web [1/1]        |        | 1:29 |      |      |
+   | Recovery             | 1:35   |      |      |      |
+   | \_  Web [1/1]        |        | 1:35 |      |      |
    | \_    DB Maintenance |        |      | 0:14 |      |
-   | \_    Graph          |        |      | 1:15 |      |
-   | \_      Tooltips     |        |      |      | 0:24 |
+   | \_    Graph          |        |      | 1:21 |      |
+   | \_      Tooltips     |        |      |      | 0:30 |
    | \_      Locale       |        |      |      | 0:51 |
    #+END:
 ** Questions
@@ -35,12 +35,15 @@
 **** DONE Tooltips
      CLOSED: [2022-04-03 So 11:57]
      :LOGBOOK:
+     CLOCK: [2022-04-04 Mo 08:54]--[2022-04-04 Mo 09:00] =>  0:06
      CLOCK: [2022-04-03 So 11:33]--[2022-04-03 So 11:57] =>  0:24
      :END:
      I would like to display the Notes - if given - in the tooltips.
-**** TODO Locale
+**** DONE Locale
+     CLOSED: [2022-04-04 Mo 09:00]
      :LOGBOOK:
      CLOCK: [2022-04-03 So 13:35]--[2022-04-03 So 14:26] =>  0:51
      :END:
      I would like the datetime values formatted appropriate to the current
      locale. At least in German format.
+** Bugs                                                                 :bug:
