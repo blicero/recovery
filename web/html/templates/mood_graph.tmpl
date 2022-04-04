@@ -1,6 +1,6 @@
 {{ define "mood_graph" }}
 {{/* Created on 28. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-03 11:56:05 krylon> */}}
+{{/* Time-stamp: <2022-04-03 14:19:06 krylon> */}}
 <div class="container">
   <canvas id="mood_graph" width="400" height=200"></canvas>
   <script>
@@ -72,6 +72,7 @@
        ],
      },
      options: {
+       locale: "de-DE",
        parsing: {
          xAxisKey: "timestamp",
          yAxisKey: "score",
@@ -79,12 +80,18 @@
        scales: {
          x: {
            type: "time",
+           time: {
+             displayFormats: {
+               minute: "HH:mm",
+               hour: "HH:mm",
+               day: "DD. MM. YYYY",
+             },
+           },
          },
          y: {
            beginAtZero: true,
          },
        },
-       locale: "de-DE",
        layout: {
          padding: {
            left: 50,
