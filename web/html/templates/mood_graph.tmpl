@@ -1,25 +1,37 @@
 {{ define "mood_graph" }}
 {{/* Created on 28. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-04 09:01:25 krylon> */}}
+{{/* Time-stamp: <2022-04-04 17:07:43 krylon> */}}
 <div class="container">
   <canvas id="mood_graph" width="400" height=200"></canvas>
   <script>
-   let ctx = $("#mood_graph");
+   let data = [
+     [
+       {{ range .Mood }}
+       {
+         timestamp:       new Date("{{ fmt_time .Timestamp }}"),
+         score:           {{ .Score }},
+         note:            "{{ js .Note }}",
+       },
+       {{ end }}
+     ],
+     [
+       {{ range .Craving }}
+       {
+         timestamp: new Date("{{ fmt_time .Timestamp }}"),
+         score: {{ .Score }},
+         note: "{{ js .Note }}",
+       },
+       {{ end }}
+     ],
+   ]
+   let ctx = $("#mood_graph")
    let mood_graph = new Chart(ctx, {
      type: "line",
      data: {
        datasets: [
          {
            label: "Mood",
-           data: [
-             {{ range .Mood }}
-             { 
-               timestamp:       new Date("{{ fmt_time .Timestamp }}"),
-               score:           {{ .Score }},
-               note:            "{{ js .Note }}",
-             },
-             {{ end }}
-           ], // .reverse(),
+           data: data[0],
            backgroundColor: [
              'rgba(255, 99, 132, 0.2)',
              'rgba(54, 162, 235, 0.2)',
@@ -41,15 +53,7 @@
          },
          {
            label: "Craving",
-           data: [
-             {{ range .Craving }}
-             { 
-               timestamp: new Date("{{ fmt_time .Timestamp }}"),
-               score: {{ .Score }},
-               note: "{{ js .Note }}",
-             },
-             {{ end }}
-           ], // .reverse(),
+           data: data[1],
            backgroundColor: [
              'rgba(255, 99, 132, 0.2)',
              'rgba(54, 162, 235, 0.2)',
@@ -90,6 +94,8 @@
          },
          y: {
            beginAtZero: true,
+           min: 0,
+           max: 256,
          },
        },
        layout: {
@@ -103,10 +109,10 @@
        plugins: {
          tooltip: {
            callbacks: {
-             title: function(ctx) {
+             title: (ctx) => {
                return ctx[0].dataset.data[ctx[0].dataIndex].timestamp.toLocaleString()
              },
-             label: function(context) {
+             label: (context) => {
                let lbl = context.dataset.label || '';
                const note = context.dataset.data[context.dataIndex].note
                const score = context.dataset.data[context.dataIndex].score
