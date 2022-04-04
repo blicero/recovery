@@ -1,5 +1,5 @@
 # -*- mode: org; fill-column: 78; -*-
-# Time-stamp: <2022-04-03 11:57:43 krylon>
+# Time-stamp: <2022-04-04 08:28:18 krylon>
 #
 #+TAGS: optimize(o) refactor(r) bug(b) feature(f) architecture(a)
 #+TAGS: web(w) database(d) javascript(j)
@@ -11,20 +11,26 @@
 
 ** Clocktable
    #+BEGIN: clocktable :scope file :maxlevel 20
-   #+CAPTION: Clock summary at [2022-04-03 So 11:57]
-   | Headline         | Time   |      |      |      |
-   |------------------+--------+------+------+------|
-   | *Total time*     | *0:24* |      |      |      |
-   |------------------+--------+------+------+------|
-   | Recovery         | 0:24   |      |      |      |
-   | \_  Web [0/1]    |        | 0:24 |      |      |
-   | \_    Graph      |        |      | 0:24 |      |
-   | \_      Tooltips |        |      |      | 0:24 |
+   #+CAPTION: Clock summary at [2022-04-04 Mo 08:28]
+   | Headline             | Time   |      |      |      |
+   |----------------------+--------+------+------+------|
+   | *Total time*         | *1:29* |      |      |      |
+   |----------------------+--------+------+------+------|
+   | Recovery             | 1:29   |      |      |      |
+   | \_  Web [1/1]        |        | 1:29 |      |      |
+   | \_    DB Maintenance |        |      | 0:14 |      |
+   | \_    Graph          |        |      | 1:15 |      |
+   | \_      Tooltips     |        |      |      | 0:24 |
+   | \_      Locale       |        |      |      | 0:51 |
    #+END:
 ** Questions
 ** Database [0/0]                                                    :database:
-** Web [0/1]                                                            :web:
-*** TODO DB Maintenance                                            :database:
+** Web [1/1]                                                            :web:
+*** DONE DB Maintenance                                            :database:
+    CLOSED: [2022-04-04 Mo 08:28]
+    :LOGBOOK:
+    CLOCK: [2022-04-04 Mo 08:14]--[2022-04-04 Mo 08:28] =>  0:14
+    :END:
 *** Graph                                                        :javascript:
 **** DONE Tooltips
      CLOSED: [2022-04-03 So 11:57]
@@ -32,3 +38,9 @@
      CLOCK: [2022-04-03 So 11:33]--[2022-04-03 So 11:57] =>  0:24
      :END:
      I would like to display the Notes - if given - in the tooltips.
+**** TODO Locale
+     :LOGBOOK:
+     CLOCK: [2022-04-03 So 13:35]--[2022-04-03 So 14:26] =>  0:51
+     :END:
+     I would like the datetime values formatted appropriate to the current
+     locale. At least in German format.
