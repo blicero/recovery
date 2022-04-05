@@ -1,5 +1,5 @@
 # -*- mode: org; fill-column: 78; -*-
-# Time-stamp: <2022-04-04 09:01:04 krylon>
+# Time-stamp: <2022-04-05 10:46:41 krylon>
 #
 #+TAGS: optimize(o) refactor(r) bug(b) feature(f) architecture(a)
 #+TAGS: web(w) database(d) javascript(j)
@@ -11,17 +11,19 @@
 
 ** Clocktable
    #+BEGIN: clocktable :scope file :maxlevel 20
-   #+CAPTION: Clock summary at [2022-04-04 Mo 09:01]
+   #+CAPTION: Clock summary at [2022-04-05 Di 10:46]
    | Headline             | Time   |      |      |      |
    |----------------------+--------+------+------+------|
-   | *Total time*         | *1:35* |      |      |      |
+   | *Total time*         | *2:16* |      |      |      |
    |----------------------+--------+------+------+------|
-   | Recovery             | 1:35   |      |      |      |
+   | Recovery             | 2:16   |      |      |      |
    | \_  Web [1/1]        |        | 1:35 |      |      |
    | \_    DB Maintenance |        |      | 0:14 |      |
    | \_    Graph          |        |      | 1:21 |      |
    | \_      Tooltips     |        |      |      | 0:30 |
    | \_      Locale       |        |      |      | 0:51 |
+   | \_  Features [0/1]   |        | 0:41 |      |      |
+   | \_    Trend Analysis |        |      | 0:41 |      |
    #+END:
 ** Questions
 ** Database [0/0]                                                    :database:
@@ -46,4 +48,17 @@
      :END:
      I would like the datetime values formatted appropriate to the current
      locale. At least in German format.
+** Features [0/1]                                                   :feature:
+*** MEDITATE Trend Analysis 
+    :LOGBOOK:
+    CLOCK: [2022-04-05 Di 10:05]--[2022-04-05 Di 10:46] =>  0:41
+    :END:
+    I am still unsure how I should go about this. But the main point of
+    actually using this application is to recognize when I am entering a
+    downward spiral, so it would be useful if the app could give me a heads
+    up.
+    My first idea, I guess, would be to compute a running average for each
+    data point over the last ... couple of days? A week?
+    And how do I implement that? Ideally, I could do it right at the SQL
+    level, but I'd have to read up on SQL window functions.
 ** Bugs                                                                 :bug:
