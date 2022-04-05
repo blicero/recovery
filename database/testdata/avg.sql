@@ -6,11 +6,11 @@
 SELECT
         m.id,
         m.timestamp,
-        m.score,
-        (SELECT avg(m1.score) AS ravg
-         FROM mood m1
-         WHERE m1.timestamp BETWEEN m.timestamp - 259200 AND m.timestamp)
-               AS ravg,
+        CAST(ROUND(AVG(score) FILTER (
+                                     WHERE timestamp BETWEEN m.timestamp - 259200
+                                                         AND m.timestamp)
+                   OVER (ORDER BY timestamp)) AS INTEGER)
+           AS mavg,
         m.note
 FROM mood m
 ORDER BY timestamp;

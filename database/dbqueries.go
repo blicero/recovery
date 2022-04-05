@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 22. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-01 08:40:45 krylon>
+// Time-stamp: <2022-04-05 15:16:27 krylon>
 
 package database
 
@@ -30,6 +30,20 @@ FROM mood
 ORDER BY timestamp DESC
 LIMIT ?
 `,
+	query.MoodGetRunningAverage: `
+SELECT
+        m.id,
+        m.timestamp,
+        CAST(ROUND(AVG(score) FILTER (
+                                     WHERE timestamp BETWEEN m.timestamp - ?
+                                                         AND m.timestamp)
+                   OVER (ORDER BY timestamp)) AS INTEGER)
+           AS mavg,
+        m.note
+FROM mood m
+ORDER BY timestamp
+LIMIT ?
+`,
 	query.CravingAdd: "INSERT INTO craving (timestamp, score, note) VALUES (?, ?, ?)",
 	query.CravingGetByTime: `
 SELECT
@@ -49,6 +63,20 @@ SELECT
     note
 FROM craving
 ORDER BY timestamp DESC
+LIMIT ?
+`,
+	query.CravingGetRunningAverage: `
+SELECT
+        c.id,
+        c.timestamp,
+        CAST(ROUND(AVG(score) FILTER (
+                                     WHERE timestamp BETWEEN c.timestamp - ?
+                                                         AND c.timestamp)
+                   OVER (ORDER BY timestamp)) AS INTEGER)
+           AS mavg,
+        c.note
+FROM craving c
+ORDER BY timestamp
 LIMIT ?
 `,
 }

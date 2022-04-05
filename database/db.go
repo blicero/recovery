@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 22. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-01 08:57:09 krylon>
+// Time-stamp: <2022-04-05 16:15:31 krylon>
 
 // Package database provides a wrapper around the database connection
 // that provides the database operations used by the application.
@@ -764,6 +764,75 @@ EXEC_QUERY:
 	return rev, nil
 } // func (db *Database) MoodGetMostRecent(cnt int) ([]data.Mood, error)
 
+// MoodGetRunningAverage returns Moods scored by the running average over
+// the last <hours> hours.
+func (db *Database) MoodGetRunningAverage(cnt, hours int) ([]data.Mood, error) {
+	const qid query.ID = query.MoodGetRunningAverage
+	var (
+		err  error
+		stmt *sql.Stmt
+	)
+
+	if stmt, err = db.getQuery(qid); err != nil {
+		db.log.Printf("[ERROR] Cannot prepare query %s: %s\n",
+			qid,
+			err.Error())
+		return nil, err
+	} else if db.tx != nil {
+		stmt = db.tx.Stmt(stmt)
+	}
+
+	var rows *sql.Rows
+
+EXEC_QUERY:
+	if rows, err = stmt.Query(hours*3600, cnt); err != nil {
+		if worthARetry(err) {
+			waitForRetry()
+			goto EXEC_QUERY
+		}
+
+		return nil, err
+	}
+
+	defer rows.Close() // nolint: errcheck,gosec
+
+	var moods = make([]data.Mood, 0, 32)
+
+	for rows.Next() {
+		var (
+			m         data.Mood
+			note      *string
+			timestamp int64
+		)
+
+		if err = rows.Scan(&m.ID, &timestamp, &m.Score, &note); err != nil {
+			db.log.Printf("[ERROR] Cannot scan row: %s\n",
+				err.Error())
+			return nil, err
+		}
+
+		m.Timestamp = time.Unix(timestamp, 0)
+
+		if note != nil {
+			m.Note = *note
+		}
+
+		moods = append(moods, m)
+	}
+
+	// var (
+	// 	l   = len(moods)
+	// 	rev = make([]data.Mood, l)
+	// )
+
+	// for i, v := range moods {
+	// 	rev[l-(i+1)] = v
+	// }
+
+	// return rev, nil
+	return moods, nil
+} // func (db *Database) MoodGetRunningAverage(cnt int) ([]data.Mood, error)
+
 // CravingAdd adds a new data point to the database.
 func (db *Database) CravingAdd(c *data.Craving) error {
 	const qid query.ID = query.CravingAdd
@@ -907,9 +976,10 @@ EXEC_QUERY:
 	return cravings, nil
 } // func (db *Database) CravingGetByTime(begin, end time.Time) ([]data.Craving, error)
 
-// CravingGetMostRecent returns the <cnt> most recent craving records.
-func (db *Database) CravingGetMostRecent(cnt int) ([]data.Craving, error) {
-	const qid query.ID = query.CravingGetMostRecent
+// CravingGetRunningAverage returns the <cnt> most recent craving records, with the
+// score replaced by the running average over the last <hours> hours.
+func (db *Database) CravingGetRunningAverage(cnt, hours int) ([]data.Craving, error) {
+	const qid query.ID = query.CravingGetRunningAverage
 	var (
 		err  error
 		stmt *sql.Stmt
@@ -927,7 +997,7 @@ func (db *Database) CravingGetMostRecent(cnt int) ([]data.Craving, error) {
 	var rows *sql.Rows
 
 EXEC_QUERY:
-	if rows, err = stmt.Query(cnt); err != nil {
+	if rows, err = stmt.Query(hours*3600, cnt); err != nil {
 		if worthARetry(err) {
 			waitForRetry()
 			goto EXEC_QUERY
@@ -942,34 +1012,39 @@ EXEC_QUERY:
 
 	for rows.Next() {
 		var (
-			m         data.Craving
+			c         data.Craving
 			note      *string
 			timestamp int64
 		)
 
-		if err = rows.Scan(&m.ID, &timestamp, &m.Score, &note); err != nil {
+		if err = rows.Scan(&c.ID, &timestamp, &c.Score, &note); err != nil {
 			db.log.Printf("[ERROR] Cannot scan row: %s\n",
 				err.Error())
 			return nil, err
 		}
 
-		m.Timestamp = time.Unix(timestamp, 0)
+		c.Timestamp = time.Unix(timestamp, 0)
+		db.log.Printf("[DEBUG] ID: %d Timestamp: %d (%s)\n",
+			c.ID,
+			timestamp,
+			c.Timestamp.Format(common.TimestampFormat))
 
 		if note != nil {
-			m.Note = *note
+			c.Note = *note
 		}
 
-		cravings = append(cravings, m)
+		cravings = append(cravings, c)
 	}
 
-	var (
-		l   = len(cravings)
-		rev = make([]data.Craving, l)
-	)
+	// var (
+	// 	l   = len(cravings)
+	// 	rev = make([]data.Craving, l)
+	// )
 
-	for i, v := range cravings {
-		rev[l-(i+1)] = v
-	}
+	// for i, v := range cravings {
+	// 	rev[l-(i+1)] = v
+	// }
 
-	return rev, nil
-} // func (db *Database) CravingGetMostRecent(cnt int) ([]data.Craving, error)
+	// return rev, nil
+	return cravings, nil
+} // func (db *Database) CravingGetRunningAverage(cnt, hours int) ([]data.Craving, error)
