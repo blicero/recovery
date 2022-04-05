@@ -1,5 +1,5 @@
-# -*- mode: org; fill-column: 78; -*-
-# Time-stamp: <2022-04-05 16:17:45 krylon>
+# -*- mode: org; fill-column: 78; coding: utf-8; -*-
+# Time-stamp: <2022-04-05 16:24:15 krylon>
 #
 #+TAGS: optimize(o) refactor(r) bug(b) feature(f) architecture(a)
 #+TAGS: web(w) database(d) javascript(j)
@@ -49,7 +49,7 @@
      I would like the datetime values formatted appropriate to the current
      locale. At least in German format.
 ** Features [0/1]                                                   :feature:
-*** MEDITATE Trend Analysis
+*** IMPLEMENT Trend Analysis
     :LOGBOOK:
     CLOCK: [2022-04-05 Di 15:00]--[2022-04-05 Di 16:17] =>  1:17
     CLOCK: [2022-04-05 Di 12:40]--[2022-04-05 Di 12:50] =>  0:10
