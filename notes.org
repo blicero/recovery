@@ -1,5 +1,5 @@
 # -*- mode: org; fill-column: 78; -*-
-# Time-stamp: <2022-04-05 10:46:41 krylon>
+# Time-stamp: <2022-04-05 16:17:45 krylon>
 #
 #+TAGS: optimize(o) refactor(r) bug(b) feature(f) architecture(a)
 #+TAGS: web(w) database(d) javascript(j)
@@ -11,19 +11,19 @@
 
 ** Clocktable
    #+BEGIN: clocktable :scope file :maxlevel 20
-   #+CAPTION: Clock summary at [2022-04-05 Di 10:46]
+   #+CAPTION: Clock summary at [2022-04-05 Di 16:17]
    | Headline             | Time   |      |      |      |
    |----------------------+--------+------+------+------|
-   | *Total time*         | *2:16* |      |      |      |
+   | *Total time*         | *3:43* |      |      |      |
    |----------------------+--------+------+------+------|
-   | Recovery             | 2:16   |      |      |      |
+   | Recovery             | 3:43   |      |      |      |
    | \_  Web [1/1]        |        | 1:35 |      |      |
    | \_    DB Maintenance |        |      | 0:14 |      |
    | \_    Graph          |        |      | 1:21 |      |
    | \_      Tooltips     |        |      |      | 0:30 |
    | \_      Locale       |        |      |      | 0:51 |
-   | \_  Features [0/1]   |        | 0:41 |      |      |
-   | \_    Trend Analysis |        |      | 0:41 |      |
+   | \_  Features [0/1]   |        | 2:08 |      |      |
+   | \_    Trend Analysis |        |      | 2:08 |      |
    #+END:
 ** Questions
 ** Database [0/0]                                                    :database:
@@ -49,8 +49,10 @@
      I would like the datetime values formatted appropriate to the current
      locale. At least in German format.
 ** Features [0/1]                                                   :feature:
-*** MEDITATE Trend Analysis 
+*** MEDITATE Trend Analysis
     :LOGBOOK:
+    CLOCK: [2022-04-05 Di 15:00]--[2022-04-05 Di 16:17] =>  1:17
+    CLOCK: [2022-04-05 Di 12:40]--[2022-04-05 Di 12:50] =>  0:10
     CLOCK: [2022-04-05 Di 10:05]--[2022-04-05 Di 10:46] =>  0:41
     :END:
     I am still unsure how I should go about this. But the main point of
