@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 06. 05. 2020 by Benjamin Walkenhorst
 // (c) 2020 Benjamin Walkenhorst
-// Time-stamp: <2022-04-01 09:12:08 krylon>
+// Time-stamp: <2022-04-05 15:53:48 krylon>
 //
 // This file contains data structures to be passed to HTML templates.
 
@@ -55,8 +55,10 @@ type tmplDataBase struct {
 // nolint: deadcode,unused
 type tmplDataIndex struct {
 	tmplDataBase
-	Mood    []data.Mood
-	Craving []data.Craving
+	Mood       []data.Mood
+	MoodAvg    []data.Mood
+	Craving    []data.Craving
+	CravingAvg []data.Craving
 }
 
 // Local Variables:  //

@@ -1,6 +1,6 @@
 {{ define "mood_graph" }}
 {{/* Created on 28. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-04 17:07:43 krylon> */}}
+{{/* Time-stamp: <2022-04-05 16:09:01 krylon> */}}
 <div class="container">
   <canvas id="mood_graph" width="400" height=200"></canvas>
   <script>
@@ -16,6 +16,24 @@
      ],
      [
        {{ range .Craving }}
+       {
+         timestamp: new Date("{{ fmt_time .Timestamp }}"),
+         score: {{ .Score }},
+         note: "{{ js .Note }}",
+       },
+       {{ end }}
+     ],
+     [
+       {{ range .MoodAvg }}
+       {
+         timestamp:       new Date("{{ fmt_time .Timestamp }}"),
+         score:           {{ .Score }},
+         note:            "{{ js .Note }}",
+       },
+       {{ end }}
+     ],
+     [
+       {{ range .CravingAvg }}
        {
          timestamp: new Date("{{ fmt_time .Timestamp }}"),
          score: {{ .Score }},
@@ -72,7 +90,51 @@
            ],
            borderWidth: 1,
            color: "rgba(214, 40, 63, 0)",
-         },          
+         },
+         {
+           label: "Mood (Average)",
+           data: data[2],
+           backgroundColor: [
+             'rgba(255, 99, 132, 0.2)',
+             'rgba(54, 162, 235, 0.2)',
+             'rgba(255, 206, 86, 0.2)',
+             'rgba(75, 192, 192, 0.2)',
+             'rgba(153, 102, 255, 0.2)',
+             'rgba(255, 159, 64, 0.2)'
+           ],
+           borderColor: [
+             'rgba(255, 99, 132, 1)',
+             'rgba(54, 162, 235, 1)',
+             'rgba(255, 206, 86, 1)',
+             'rgba(75, 192, 192, 1)',
+             'rgba(153, 102, 255, 1)',
+             'rgba(255, 159, 64, 1)'
+           ],
+           borderWidth: 1,
+           color: "rgba(255, 198, 122, 0)",
+         },
+         {
+           label: "Craving (Average)",
+           data: data[3],
+           backgroundColor: [
+             'rgba(255, 99, 132, 0.2)',
+             'rgba(54, 162, 235, 0.2)',
+             'rgba(255, 206, 86, 0.2)',
+             'rgba(75, 192, 192, 0.2)',
+             'rgba(153, 102, 255, 0.2)',
+             'rgba(255, 159, 64, 0.2)'
+           ],
+           borderColor: [
+             'rgba(255, 99, 132, 1)',
+             'rgba(54, 162, 235, 1)',
+             'rgba(255, 206, 86, 1)',
+             'rgba(75, 192, 192, 1)',
+             'rgba(153, 102, 255, 1)',
+             'rgba(255, 159, 64, 1)'
+           ],
+           borderWidth: 1,
+           color: "rgba(4, 125, 32, 0)",
+         },
        ],
      },
      options: {

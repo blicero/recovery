@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 01. 04. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-04 08:26:52 krylon>
+// Time-stamp: <2022-04-05 15:58:19 krylon>
 
 // Package web provides the web interface to the application.
 package web
@@ -242,6 +242,8 @@ func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	db = srv.pool.Get()
 	defer srv.pool.Put(db)
 
+	const avgHours = 96
+
 	if data.Mood, err = db.MoodGetByTime(begin, end); err != nil {
 		msg = fmt.Sprintf("Cannot load mood data: %s",
 			err.Error())
@@ -250,6 +252,20 @@ func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		srv.sendErrorMessage(w, msg)
 		return
 	} else if data.Craving, err = db.CravingGetByTime(begin, end); err != nil {
+		msg = fmt.Sprintf("Cannot load craving data: %s",
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		srv.sendErrorMessage(w, msg)
+		return
+	} else if data.MoodAvg, err = db.MoodGetRunningAverage(len(data.Mood), avgHours); err != nil {
+		msg = fmt.Sprintf("Cannot load mood data: %s",
+			err.Error())
+		srv.log.Println("[ERROR] " + msg)
+		srv.SendMessage(msg)
+		srv.sendErrorMessage(w, msg)
+		return
+	} else if data.CravingAvg, err = db.CravingGetRunningAverage(len(data.Craving), avgHours); err != nil {
 		msg = fmt.Sprintf("Cannot load craving data: %s",
 			err.Error())
 		srv.log.Println("[ERROR] " + msg)
