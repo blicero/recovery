@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 01. 04. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-05 15:58:19 krylon>
+// Time-stamp: <2022-04-06 11:43:50 krylon>
 
 // Package web provides the web interface to the application.
 package web
@@ -212,6 +212,7 @@ func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	const (
 		tmplName = "index"
 		timespan = 86400 * 14
+		avgHours = 96
 	)
 
 	var (
@@ -242,8 +243,6 @@ func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	db = srv.pool.Get()
 	defer srv.pool.Put(db)
 
-	const avgHours = 96
-
 	if data.Mood, err = db.MoodGetByTime(begin, end); err != nil {
 		msg = fmt.Sprintf("Cannot load mood data: %s",
 			err.Error())
@@ -273,6 +272,8 @@ func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		srv.sendErrorMessage(w, msg)
 		return
 	}
+
+	data.Offset, data.Slope = linearRegression(data.Mood)
 
 	data.Messages = srv.getMessages()
 

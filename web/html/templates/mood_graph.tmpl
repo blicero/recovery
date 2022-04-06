@@ -1,196 +1,206 @@
 {{ define "mood_graph" }}
 {{/* Created on 28. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-05 16:09:01 krylon> */}}
+{{/* Time-stamp: <2022-04-06 11:47:57 krylon> */}}
 <div class="container">
-  <canvas id="mood_graph" width="400" height=200"></canvas>
-  <script>
-   let data = [
-     [
-       {{ range .Mood }}
-       {
-         timestamp:       new Date("{{ fmt_time .Timestamp }}"),
-         score:           {{ .Score }},
-         note:            "{{ js .Note }}",
-       },
-       {{ end }}
-     ],
-     [
-       {{ range .Craving }}
-       {
-         timestamp: new Date("{{ fmt_time .Timestamp }}"),
-         score: {{ .Score }},
-         note: "{{ js .Note }}",
-       },
-       {{ end }}
-     ],
-     [
-       {{ range .MoodAvg }}
-       {
-         timestamp:       new Date("{{ fmt_time .Timestamp }}"),
-         score:           {{ .Score }},
-         note:            "{{ js .Note }}",
-       },
-       {{ end }}
-     ],
-     [
-       {{ range .CravingAvg }}
-       {
-         timestamp: new Date("{{ fmt_time .Timestamp }}"),
-         score: {{ .Score }},
-         note: "{{ js .Note }}",
-       },
-       {{ end }}
-     ],
-   ]
-   let ctx = $("#mood_graph")
-   let mood_graph = new Chart(ctx, {
-     type: "line",
-     data: {
-       datasets: [
+  <div class="row">
+    <div class="column">
+      Offet: {{ .Offset }}
+    </div>
+    <div class="column">
+      Slope: {{ .Slope }}
+    </div>
+  </div>
+  <div class="row">
+    <canvas id="mood_graph" width="400" height=200"></canvas>
+    <script>
+     let data = [
+       [
+         {{ range .Mood }}
          {
-           label: "Mood",
-           data: data[0],
-           backgroundColor: [
-             'rgba(255, 99, 132, 0.2)',
-             'rgba(54, 162, 235, 0.2)',
-             'rgba(255, 206, 86, 0.2)',
-             'rgba(75, 192, 192, 0.2)',
-             'rgba(153, 102, 255, 0.2)',
-             'rgba(255, 159, 64, 0.2)'
-           ],
-           borderColor: [
-             'rgba(255, 99, 132, 1)',
-             'rgba(54, 162, 235, 1)',
-             'rgba(255, 206, 86, 1)',
-             'rgba(75, 192, 192, 1)',
-             'rgba(153, 102, 255, 1)',
-             'rgba(255, 159, 64, 1)'
-           ],
-           borderWidth: 1,
-           color: "rgba(0, 164, 33, 0)",
+           timestamp:       new Date("{{ fmt_time .Timestamp }}"),
+           score:           {{ .Score }},
+           note:            "{{ js .Note }}",
          },
-         {
-           label: "Craving",
-           data: data[1],
-           backgroundColor: [
-             'rgba(255, 99, 132, 0.2)',
-             'rgba(54, 162, 235, 0.2)',
-             'rgba(255, 206, 86, 0.2)',
-             'rgba(75, 192, 192, 0.2)',
-             'rgba(153, 102, 255, 0.2)',
-             'rgba(255, 159, 64, 0.2)'
-           ],
-           borderColor: [
-             'rgba(255, 99, 132, 1)',
-             'rgba(54, 162, 235, 1)',
-             'rgba(255, 206, 86, 1)',
-             'rgba(75, 192, 192, 1)',
-             'rgba(153, 102, 255, 1)',
-             'rgba(255, 159, 64, 1)'
-           ],
-           borderWidth: 1,
-           color: "rgba(214, 40, 63, 0)",
-         },
-         {
-           label: "Mood (Average)",
-           data: data[2],
-           backgroundColor: [
-             'rgba(255, 99, 132, 0.2)',
-             'rgba(54, 162, 235, 0.2)',
-             'rgba(255, 206, 86, 0.2)',
-             'rgba(75, 192, 192, 0.2)',
-             'rgba(153, 102, 255, 0.2)',
-             'rgba(255, 159, 64, 0.2)'
-           ],
-           borderColor: [
-             'rgba(255, 99, 132, 1)',
-             'rgba(54, 162, 235, 1)',
-             'rgba(255, 206, 86, 1)',
-             'rgba(75, 192, 192, 1)',
-             'rgba(153, 102, 255, 1)',
-             'rgba(255, 159, 64, 1)'
-           ],
-           borderWidth: 1,
-           color: "rgba(255, 198, 122, 0)",
-         },
-         {
-           label: "Craving (Average)",
-           data: data[3],
-           backgroundColor: [
-             'rgba(255, 99, 132, 0.2)',
-             'rgba(54, 162, 235, 0.2)',
-             'rgba(255, 206, 86, 0.2)',
-             'rgba(75, 192, 192, 0.2)',
-             'rgba(153, 102, 255, 0.2)',
-             'rgba(255, 159, 64, 0.2)'
-           ],
-           borderColor: [
-             'rgba(255, 99, 132, 1)',
-             'rgba(54, 162, 235, 1)',
-             'rgba(255, 206, 86, 1)',
-             'rgba(75, 192, 192, 1)',
-             'rgba(153, 102, 255, 1)',
-             'rgba(255, 159, 64, 1)'
-           ],
-           borderWidth: 1,
-           color: "rgba(4, 125, 32, 0)",
-         },
+         {{ end }}
        ],
-     },
-     options: {
-       locale: "de-DE",
-       parsing: {
-         xAxisKey: "timestamp",
-         yAxisKey: "score",
+       [
+         {{ range .Craving }}
+         {
+           timestamp: new Date("{{ fmt_time .Timestamp }}"),
+           score: {{ .Score }},
+           note: "{{ js .Note }}",
+         },
+         {{ end }}
+       ],
+       [
+         {{ range .MoodAvg }}
+         {
+           timestamp:       new Date("{{ fmt_time .Timestamp }}"),
+           score:           {{ .Score }},
+           note:            "{{ js .Note }}",
+         },
+         {{ end }}
+       ],
+       [
+         {{ range .CravingAvg }}
+         {
+           timestamp: new Date("{{ fmt_time .Timestamp }}"),
+           score: {{ .Score }},
+           note: "{{ js .Note }}",
+         },
+         {{ end }}
+       ],
+     ]
+     let ctx = $("#mood_graph")
+     let mood_graph = new Chart(ctx, {
+       type: "line",
+       data: {
+         datasets: [
+           {
+             label: "Mood",
+             data: data[0],
+             backgroundColor: [
+               'rgba(255, 99, 132, 0.2)',
+               'rgba(54, 162, 235, 0.2)',
+               'rgba(255, 206, 86, 0.2)',
+               'rgba(75, 192, 192, 0.2)',
+               'rgba(153, 102, 255, 0.2)',
+               'rgba(255, 159, 64, 0.2)'
+             ],
+             borderColor: [
+               'rgba(255, 99, 132, 1)',
+               'rgba(54, 162, 235, 1)',
+               'rgba(255, 206, 86, 1)',
+               'rgba(75, 192, 192, 1)',
+               'rgba(153, 102, 255, 1)',
+               'rgba(255, 159, 64, 1)'
+             ],
+             borderWidth: 1,
+             color: "rgba(0, 164, 33, 0)",
+           },
+           {
+             label: "Craving",
+             data: data[1],
+             backgroundColor: [
+               'rgba(255, 99, 132, 0.2)',
+               'rgba(54, 162, 235, 0.2)',
+               'rgba(255, 206, 86, 0.2)',
+               'rgba(75, 192, 192, 0.2)',
+               'rgba(153, 102, 255, 0.2)',
+               'rgba(255, 159, 64, 0.2)'
+             ],
+             borderColor: [
+               'rgba(255, 99, 132, 1)',
+               'rgba(54, 162, 235, 1)',
+               'rgba(255, 206, 86, 1)',
+               'rgba(75, 192, 192, 1)',
+               'rgba(153, 102, 255, 1)',
+               'rgba(255, 159, 64, 1)'
+             ],
+             borderWidth: 1,
+             color: "rgba(214, 40, 63, 0)",
+           },
+           {
+             label: "Mood (Average)",
+             data: data[2],
+             backgroundColor: [
+               'rgba(255, 99, 132, 0.2)',
+               'rgba(54, 162, 235, 0.2)',
+               'rgba(255, 206, 86, 0.2)',
+               'rgba(75, 192, 192, 0.2)',
+               'rgba(153, 102, 255, 0.2)',
+               'rgba(255, 159, 64, 0.2)'
+             ],
+             borderColor: [
+               'rgba(255, 99, 132, 1)',
+               'rgba(54, 162, 235, 1)',
+               'rgba(255, 206, 86, 1)',
+               'rgba(75, 192, 192, 1)',
+               'rgba(153, 102, 255, 1)',
+               'rgba(255, 159, 64, 1)'
+             ],
+             borderWidth: 1,
+             color: "rgba(255, 198, 122, 0)",
+           },
+           {
+             label: "Craving (Average)",
+             data: data[3],
+             backgroundColor: [
+               'rgba(255, 99, 132, 0.2)',
+               'rgba(54, 162, 235, 0.2)',
+               'rgba(255, 206, 86, 0.2)',
+               'rgba(75, 192, 192, 0.2)',
+               'rgba(153, 102, 255, 0.2)',
+               'rgba(255, 159, 64, 0.2)'
+             ],
+             borderColor: [
+               'rgba(255, 99, 132, 1)',
+               'rgba(54, 162, 235, 1)',
+               'rgba(255, 206, 86, 1)',
+               'rgba(75, 192, 192, 1)',
+               'rgba(153, 102, 255, 1)',
+               'rgba(255, 159, 64, 1)'
+             ],
+             borderWidth: 1,
+             color: "rgba(4, 125, 32, 0)",
+           },
+         ],
        },
-       scales: {
-         x: {
-           type: "time",
-           time: {
-             displayFormats: {
-               minute: "HH:mm",
-               hour: "HH:mm",
-               day: "DD. MM. YYYY",
+       options: {
+         locale: "de-DE",
+         parsing: {
+           xAxisKey: "timestamp",
+           yAxisKey: "score",
+         },
+         scales: {
+           x: {
+             type: "time",
+             time: {
+               displayFormats: {
+                 minute: "HH:mm",
+                 hour: "HH:mm",
+                 day: "DD. MM. YYYY",
+               },
+             },
+           },
+           y: {
+             beginAtZero: true,
+             min: 0,
+             max: 256,
+           },
+         },
+         layout: {
+           padding: {
+             left: 50,
+             right: 50,
+             top: 0,
+             bottom: 0,
+           },
+         },
+         plugins: {
+           tooltip: {
+             callbacks: {
+               title: (ctx) => {
+                 return ctx[0].dataset.data[ctx[0].dataIndex].timestamp.toLocaleString()
+               },
+               label: (context) => {
+                 let lbl = context.dataset.label || '';
+                 const note = context.dataset.data[context.dataIndex].note
+                 const score = context.dataset.data[context.dataIndex].score
+
+                 lbl += `: ${score}`
+
+                 if (lbl && note != '') {
+                   lbl += ` (${note})`;
+                 }
+                 return lbl;
+               },
              },
            },
          },
-         y: {
-           beginAtZero: true,
-           min: 0,
-           max: 256,
-         },
        },
-       layout: {
-         padding: {
-           left: 50,
-           right: 50,
-           top: 0,
-           bottom: 0,
-         },
-       },
-       plugins: {
-         tooltip: {
-           callbacks: {
-             title: (ctx) => {
-               return ctx[0].dataset.data[ctx[0].dataIndex].timestamp.toLocaleString()
-             },
-             label: (context) => {
-               let lbl = context.dataset.label || '';
-               const note = context.dataset.data[context.dataIndex].note
-               const score = context.dataset.data[context.dataIndex].score
-
-               lbl += `: ${score}`
-
-               if (lbl && note != '') {
-                 lbl += ` (${note})`;
-               }
-               return lbl;
-             },
-           },
-         },
-       },
-     },
-   });
-  </script>
+     });
+    </script>
+  </div>
 </div>
 {{ end }}

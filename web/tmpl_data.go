@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 06. 05. 2020 by Benjamin Walkenhorst
 // (c) 2020 Benjamin Walkenhorst
-// Time-stamp: <2022-04-05 15:53:48 krylon>
+// Time-stamp: <2022-04-06 11:43:26 krylon>
 //
 // This file contains data structures to be passed to HTML templates.
 
@@ -59,6 +59,8 @@ type tmplDataIndex struct {
 	MoodAvg    []data.Mood
 	Craving    []data.Craving
 	CravingAvg []data.Craving
+	Offset     float64
+	Slope      float64
 }
 
 // Local Variables:  //
