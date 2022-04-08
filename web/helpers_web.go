@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 04. 09. 2019 by Benjamin Walkenhorst
 // (c) 2019 Benjamin Walkenhorst
-// Time-stamp: <2022-04-06 11:32:13 krylon>
+// Time-stamp: <2022-04-07 09:10:29 krylon>
 //
 // Helper functions for use by the HTTP request handlers
 
@@ -32,15 +32,19 @@ func errJSON(msg string) []byte {
 func linearRegression(values []data.Mood) (float64, float64) {
 	const origin = false
 	var (
-		offset, slope float64
-		xs            = make([]float64, len(values))
-		ys            = make([]float64, len(values))
-		weights       []float64
+		offset, slope, idx float64
+		xs                 = make([]float64, 0, len(values))
+		ys                 = make([]float64, 0, len(values))
+		weights            []float64
+		// minStamp      = time.Now().Unix() - (86400 * 2)
 	)
 
-	for i, v := range values {
-		xs[i] = float64(v.Timestamp.Unix())
-		ys[i] = float64(v.Score)
+	for _, v := range values {
+		//if v.Timestamp.Unix() >= minStamp {
+		xs = append(xs, idx) //append(xs, float64(v.Timestamp.Unix()))
+		ys = append(ys, float64(v.Score))
+		idx++
+		// }
 	}
 
 	offset, slope = stat.LinearRegression(xs, ys, weights, origin)
