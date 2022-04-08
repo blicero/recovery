@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 01. 04. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-06 11:43:50 krylon>
+// Time-stamp: <2022-04-06 13:56:47 krylon>
 
 // Package web provides the web interface to the application.
 package web
@@ -212,7 +212,7 @@ func (srv *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	const (
 		tmplName = "index"
 		timespan = 86400 * 14
-		avgHours = 96
+		avgHours = 48
 	)
 
 	var (

@@ -2,7 +2,7 @@
 // -*- mode: go; coding: utf-8; -*-
 // Created on 22. 03. 2022 by Benjamin Walkenhorst
 // (c) 2022 Benjamin Walkenhorst
-// Time-stamp: <2022-04-05 16:15:31 krylon>
+// Time-stamp: <2022-04-08 18:55:57 krylon>
 
 // Package database provides a wrapper around the database connection
 // that provides the database operations used by the application.
@@ -636,7 +636,7 @@ EXEC_QUERY:
 } // func (db *Database) MoodAdd(m *mood.Mood) error
 
 // MoodGetByTime returns all mood records for the given timespan.
-func (db *Database) MoodGetByTime(begin, end time.Time) ([]data.Mood, error) {
+func (db *Database) MoodGetByTime(begin, end time.Time) (data.MoodList, error) {
 	const qid query.ID = query.MoodGetByTime
 	var (
 		err  error
@@ -670,7 +670,7 @@ EXEC_QUERY:
 
 	defer rows.Close() // nolint: errcheck,gosec
 
-	var moods = make([]data.Mood, 0, 32)
+	var moods = make(data.MoodList, 0, 32)
 
 	for rows.Next() {
 		var (
@@ -698,7 +698,7 @@ EXEC_QUERY:
 } // func (db *Database) MoodGetByTime(begin, end time.Time) ([]data.Mood, error)
 
 // MoodGetMostRecent returns the <cnt> most recent mood records.
-func (db *Database) MoodGetMostRecent(cnt int) ([]data.Mood, error) {
+func (db *Database) MoodGetMostRecent(cnt int) (data.MoodList, error) {
 	const qid query.ID = query.MoodGetMostRecent
 	var (
 		err  error
@@ -728,7 +728,7 @@ EXEC_QUERY:
 
 	defer rows.Close() // nolint: errcheck,gosec
 
-	var moods = make([]data.Mood, 0, 32)
+	var moods = make(data.MoodList, 0, 32)
 
 	for rows.Next() {
 		var (
@@ -766,7 +766,7 @@ EXEC_QUERY:
 
 // MoodGetRunningAverage returns Moods scored by the running average over
 // the last <hours> hours.
-func (db *Database) MoodGetRunningAverage(cnt, hours int) ([]data.Mood, error) {
+func (db *Database) MoodGetRunningAverage(cnt, hours int) (data.MoodList, error) {
 	const qid query.ID = query.MoodGetRunningAverage
 	var (
 		err  error
@@ -796,7 +796,7 @@ EXEC_QUERY:
 
 	defer rows.Close() // nolint: errcheck,gosec
 
-	var moods = make([]data.Mood, 0, 32)
+	var moods = make(data.MoodList, 0, 32)
 
 	for rows.Next() {
 		var (
@@ -820,16 +820,6 @@ EXEC_QUERY:
 		moods = append(moods, m)
 	}
 
-	// var (
-	// 	l   = len(moods)
-	// 	rev = make([]data.Mood, l)
-	// )
-
-	// for i, v := range moods {
-	// 	rev[l-(i+1)] = v
-	// }
-
-	// return rev, nil
 	return moods, nil
 } // func (db *Database) MoodGetRunningAverage(cnt int) ([]data.Mood, error)
 
@@ -1024,10 +1014,6 @@ EXEC_QUERY:
 		}
 
 		c.Timestamp = time.Unix(timestamp, 0)
-		db.log.Printf("[DEBUG] ID: %d Timestamp: %d (%s)\n",
-			c.ID,
-			timestamp,
-			c.Timestamp.Format(common.TimestampFormat))
 
 		if note != nil {
 			c.Note = *note
@@ -1036,15 +1022,5 @@ EXEC_QUERY:
 		cravings = append(cravings, c)
 	}
 
-	// var (
-	// 	l   = len(cravings)
-	// 	rev = make([]data.Craving, l)
-	// )
-
-	// for i, v := range cravings {
-	// 	rev[l-(i+1)] = v
-	// }
-
-	// return rev, nil
 	return cravings, nil
 } // func (db *Database) CravingGetRunningAverage(cnt, hours int) ([]data.Craving, error)

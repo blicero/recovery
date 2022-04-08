@@ -1,13 +1,13 @@
 {{ define "mood_graph" }}
 {{/* Created on 28. 03. 2021 */}}
-{{/* Time-stamp: <2022-04-06 11:47:57 krylon> */}}
+{{/* Time-stamp: <2022-04-07 08:40:49 krylon> */}}
 <div class="container">
   <div class="row">
     <div class="column">
-      Offet: {{ .Offset }}
+      Offet: {{ fmt_float .Offset }}
     </div>
     <div class="column">
-      Slope: {{ .Slope }}
+      Slope: {{ fmt_float .Slope }}
     </div>
   </div>
   <div class="row">
